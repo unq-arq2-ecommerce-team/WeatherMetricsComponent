@@ -2,6 +2,9 @@ package infrastructure
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
@@ -12,8 +15,6 @@ import (
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/config"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/handlers"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/middleware"
-	"io"
-	"net/http"
 )
 
 // Application
@@ -62,12 +63,10 @@ func (app *ginApplication) Run() error {
 	gin.DefaultWriter = io.Discard
 
 	router := gin.Default()
-	promRouter := gin.Default()
 
 	router.GET("/", HealthCheck)
-	promRouter.GET("/", HealthCheck)
 
-	promRouter.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	routerApiV1 := router.Group("/api/v1")
 	routerApiV1.Use(middleware.TracingRequestId())
@@ -79,13 +78,6 @@ func (app *ginApplication) Run() error {
 
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	go func() {
-		app.logger.Infof("running prometheus server on port %d", app.config.PrometheusPort)
-		err := promRouter.Run(fmt.Sprintf(":%v", app.config.PrometheusPort))
-		if err != nil {
-			app.logger.Errorf("error running prometheus server: %v", err)
-		}
-	}()
 	app.logger.Infof("running http server on port %d", app.config.Port)
 	return router.Run(fmt.Sprintf(":%v", app.config.Port))
 }
