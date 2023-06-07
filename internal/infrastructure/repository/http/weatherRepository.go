@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/domain"
-	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/config"
-	loggerPkg "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
 	"io"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/domain"
+	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/config"
+	loggerPkg "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
 )
 
 type weatherRepository struct {
