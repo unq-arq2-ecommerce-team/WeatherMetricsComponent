@@ -22,7 +22,15 @@ func main() {
 
 	// use cases
 	findCityCurrentTemperatureQuery := app.NewFindCityCurrentTemperatureQuery(weatherRepo)
+	getCityLastDayTemperatureAverageQuery := app.NewGetCityLastDayTemperatureAverageQuery(weatherRepo)
+	getCityLastWeekTemperatureAverageQuery := app.NewGetCityLastWeekTemperatureAverageQuery(weatherRepo)
 
-	application := infra.NewGinApplication(conf, logger, findCityCurrentTemperatureQuery)
+	application := infra.NewGinApplication(
+		conf,
+		logger,
+		findCityCurrentTemperatureQuery,
+		getCityLastDayTemperatureAverageQuery,
+		getCityLastWeekTemperatureAverageQuery,
+	)
 	logger.Fatal(application.Run())
 }

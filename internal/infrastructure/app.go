@@ -31,16 +31,26 @@ type Application interface {
 }
 
 type ginApplication struct {
-	logger                          domain.Logger
-	config                          config.Config
-	findCityCurrentTemperatureQuery *application.FindCityCurrentTemperatureQuery
+	logger                                 domain.Logger
+	config                                 config.Config
+	findCityCurrentTemperatureQuery        *application.FindCityCurrentTemperatureQuery
+	getCityLastDayTemperatureAverageQuery  *application.GetCityLastDayTemperatureAverageQuery
+	getCityLastWeekTemperatureAverageQuery *application.GetCityLastWeekTemperatureAverageQuery
 }
 
-func NewGinApplication(config config.Config, logger domain.Logger, findCityCurrentTemperatureQuery *application.FindCityCurrentTemperatureQuery) Application {
+func NewGinApplication(
+	config config.Config,
+	logger domain.Logger,
+	findCityCurrentTemperatureQuery *application.FindCityCurrentTemperatureQuery,
+	getCityLastDayTemperatureAverageQuery *application.GetCityLastDayTemperatureAverageQuery,
+	getCityLastWeekTemperatureAverageQuery *application.GetCityLastWeekTemperatureAverageQuery,
+) Application {
 	return &ginApplication{
-		logger:                          logger,
-		config:                          config,
-		findCityCurrentTemperatureQuery: findCityCurrentTemperatureQuery,
+		logger:                                 logger,
+		config:                                 config,
+		findCityCurrentTemperatureQuery:        findCityCurrentTemperatureQuery,
+		getCityLastDayTemperatureAverageQuery:  getCityLastDayTemperatureAverageQuery,
+		getCityLastWeekTemperatureAverageQuery: getCityLastWeekTemperatureAverageQuery,
 	}
 }
 
@@ -57,6 +67,8 @@ func (app *ginApplication) Run() error {
 	routerApiV1.Use(middleware.TracingRequestId())
 
 	routerApiV1.GET("/weather/city/:city/temperature", handlers.FindCityCurrentTemperatureHandler(app.logger, app.findCityCurrentTemperatureQuery))
+	routerApiV1.GET("/weather/city/:city/temperature/last/day", handlers.GetCityLastDayTemperatureAverageHandler(app.logger, app.getCityLastDayTemperatureAverageQuery))
+	routerApiV1.GET("/weather/city/:city/temperature/last/week", handlers.GetCityLastWeekTemperatureAverageHandler(app.logger, app.getCityLastWeekTemperatureAverageQuery))
 
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

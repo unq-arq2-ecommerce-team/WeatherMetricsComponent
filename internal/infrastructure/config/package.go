@@ -16,9 +16,8 @@ type Config struct {
 }
 
 type WeatherEndpoint struct {
-	CurrentTempUrl     string `split_words:"true" required:"true"`
-	AvgTempLastDayUrl  string `split_words:"true" required:"true"`
-	AvgTempLastWeekUrl string `split_words:"true" required:"true"`
+	CurrentTempUrl string `split_words:"true" required:"true"`
+	AvgTempUrl     string `split_words:"true" required:"true"`
 }
 
 func LoadConfig() Config {
