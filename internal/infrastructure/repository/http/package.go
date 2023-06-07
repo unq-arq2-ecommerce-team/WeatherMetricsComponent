@@ -2,9 +2,10 @@ package http
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/hashicorp/go-cleanhttp"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
-	"net/http"
 )
 
 func NewClient() *http.Client {

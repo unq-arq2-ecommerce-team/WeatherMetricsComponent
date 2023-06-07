@@ -9,10 +9,11 @@ import (
 const ServiceName = "WeatherMetricsComponent"
 
 type Config struct {
-	Environment string          `required:"true" default:"development"`
-	Port        int             `required:"true" default:"8080"`
-	LogLevel    string          `split_words:"true" default:"DEBUG"`
-	Weather     WeatherEndpoint `required:"true"`
+	Environment    string          `required:"true" default:"development"`
+	Port           int             `required:"true" default:"8080"`
+	PrometheusPort int             `required:"true" default:"8081"`
+	LogLevel       string          `split_words:"true" default:"DEBUG"`
+	Weather        WeatherEndpoint `required:"true"`
 }
 
 type WeatherEndpoint struct {
