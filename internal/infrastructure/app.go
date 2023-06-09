@@ -67,7 +67,7 @@ func (app *ginApplication) Run() error {
 	router.GET("/", HealthCheck)
 
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
-
+	middleware.InitMetrics()
 	routerApiV1 := router.Group("/api/v1")
 	routerApiV1.Use(middleware.TracingRequestId())
 	routerApiV1.Use(middleware.PrometheusMiddleware())
