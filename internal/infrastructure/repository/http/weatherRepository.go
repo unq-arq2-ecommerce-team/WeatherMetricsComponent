@@ -17,15 +17,15 @@ import (
 
 type weatherRepository struct {
 	logger            domain.Logger
-	client            *http.Client
+	httpClient        *http.Client
 	getCurrentTempUrl string
 	getAvgTempUrl     string
 }
 
-func NewWeatherRepository(logger domain.Logger, client *http.Client, weatherConfig config.WeatherEndpoint) domain.WeatherRepository {
+func NewWeatherRepository(logger domain.Logger, httpClient *http.Client, weatherConfig config.WeatherEndpoint) domain.WeatherRepository {
 	return &weatherRepository{
 		logger:            logger.WithFields(domain.LoggerFields{"repository.http": "weatherRepository"}),
-		client:            client,
+		httpClient:        httpClient,
 		getCurrentTempUrl: weatherConfig.CurrentTempUrl,
 		getAvgTempUrl:     weatherConfig.AvgTempUrl,
 	}
@@ -42,7 +42,7 @@ func (r weatherRepository) FindCurrentTemperatureByCity(ctx context.Context, cit
 		return nil, err
 	}
 	sw := time.Now()
-	res, err := r.client.Do(req)
+	res, err := r.httpClient.Do(req)
 	if err != nil {
 		log.WithFields(domain.LoggerFields{"error": err}).Error("http error do request")
 		return nil, err
@@ -68,7 +68,7 @@ func (r weatherRepository) FindCurrentTemperatureByCity(ctx context.Context, cit
 			log.WithFields(domain.LoggerFields{"error": err}).Errorf("error decoding res body")
 			return nil, fmt.Errorf("weather repository error with status code %v and url %s", statusCode, url)
 		}
-		log.Infof("successful find current temperature with city %s", city)
+		log.Infof("successful find current temperature")
 		return &weather, nil
 	case statusCode == http.StatusNotFound:
 		return nil, domain.WeatherNotFoundError{City: city}
@@ -93,7 +93,7 @@ func (r weatherRepository) GetAverageTemperatureByCityAndDateRange(ctx context.C
 	}
 	log = log.WithFields(domain.LoggerFields{"url": req.URL.String()})
 	sw := time.Now()
-	res, err := r.client.Do(req)
+	res, err := r.httpClient.Do(req)
 	if err != nil {
 		log.WithFields(domain.LoggerFields{"error": err}).Error("http error do request")
 		return nil, err

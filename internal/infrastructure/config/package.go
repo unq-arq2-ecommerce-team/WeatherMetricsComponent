@@ -4,6 +4,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	loggerPkg "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
+	"time"
 )
 
 const ServiceName = "WeatherMetricsComponent"
@@ -17,8 +18,15 @@ type Config struct {
 }
 
 type WeatherEndpoint struct {
-	CurrentTempUrl string `split_words:"true" required:"true"`
-	AvgTempUrl     string `split_words:"true" required:"true"`
+	CurrentTempUrl   string      `split_words:"true" required:"true"`
+	CurrentTempCache CacheConfig `split_words:"true" required:"true"`
+	AvgTempUrl       string      `split_words:"true" required:"true"`
+	AvgTempCache     CacheConfig `split_words:"true" required:"true"`
+}
+
+type CacheConfig struct {
+	DefaultExp time.Duration `split_words:"true" required:"true"`
+	PurgesExp  time.Duration `split_words:"true" required:"true"`
 }
 
 func LoadConfig() Config {
