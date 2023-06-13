@@ -18,10 +18,20 @@ type Config struct {
 }
 
 type WeatherEndpoint struct {
-	CurrentTempUrl   string      `split_words:"true" required:"true"`
-	CurrentTempCache CacheConfig `split_words:"true" required:"true"`
-	AvgTempUrl       string      `split_words:"true" required:"true"`
-	AvgTempCache     CacheConfig `split_words:"true" required:"true"`
+	CurrentTemp EndpointConfig `split_words:"true" required:"true"`
+	AvgTemp     EndpointConfig `split_words:"true" required:"true"`
+	HttpConfig  HttpConfig     `split_words:"true"`
+}
+
+type EndpointConfig struct {
+	Url   string      `split_words:"true" required:"true"`
+	Cache CacheConfig `split_words:"true" required:"true"`
+}
+
+type HttpConfig struct {
+	Timeout   time.Duration `default:"10s"`
+	Retries   int           `default:"0"`
+	RetryWait time.Duration `split_words:"true" default:"15s"`
 }
 
 type CacheConfig struct {

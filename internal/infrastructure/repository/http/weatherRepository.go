@@ -26,8 +26,8 @@ func NewWeatherRepository(logger domain.Logger, httpClient *http.Client, weather
 	return &weatherRepository{
 		logger:            logger.WithFields(domain.LoggerFields{"repository.http": "weatherRepository"}),
 		httpClient:        httpClient,
-		getCurrentTempUrl: weatherConfig.CurrentTempUrl,
-		getAvgTempUrl:     weatherConfig.AvgTempUrl,
+		getCurrentTempUrl: weatherConfig.CurrentTemp.Url,
+		getAvgTempUrl:     weatherConfig.AvgTemp.Url,
 	}
 }
 

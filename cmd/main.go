@@ -19,11 +19,11 @@ func main() {
 		LogFormat:       loggerPkg.JsonFormat,
 	})
 
-	cacheTables := initCacheTables(conf.Weather.CurrentTempCache, conf.Weather.AvgTempCache)
+	cacheTables := initCacheTables(conf.Weather.CurrentTemp.Cache, conf.Weather.AvgTemp.Cache)
 	cacheClient := cache.NewLocalMemoryCacheClient(logger, cacheTables)
 
 	// repositories
-	baseWeatherRepo := http.NewWeatherRepository(logger, http.NewClient(), conf.Weather)
+	baseWeatherRepo := http.NewWeatherRepository(logger, http.NewClient(conf.Weather.HttpConfig), conf.Weather)
 	cacheWeatherRepo := cache.NewWeatherRepository(logger, cacheClient, baseWeatherRepo)
 
 	// use cases

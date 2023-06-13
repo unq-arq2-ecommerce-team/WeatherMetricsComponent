@@ -2,14 +2,31 @@ package http
 
 import (
 	"context"
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/config"
+	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
 	"net/http"
+	"time"
 
 	"github.com/hashicorp/go-cleanhttp"
-	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
 )
 
-func NewClient() *http.Client {
+const deltaRetryWait = 2 * time.Second
+
+func NewDefaultClient() *http.Client {
 	return cleanhttp.DefaultPooledClient()
+}
+
+func NewClient(httpConfig config.HttpConfig) *http.Client {
+	httpClient := NewDefaultClient()
+	httpClient.Timeout = httpConfig.Timeout
+
+	retryableClient := retryablehttp.NewClient()
+	retryableClient.HTTPClient = httpClient
+	retryableClient.RetryMax = httpConfig.Retries
+	retryableClient.RetryWaitMin = httpConfig.RetryWait
+	retryableClient.RetryWaitMax = httpConfig.RetryWait + deltaRetryWait
+	return retryableClient.StandardClient()
 }
 
 func IsStatusCode2XX(statusCode int) bool {

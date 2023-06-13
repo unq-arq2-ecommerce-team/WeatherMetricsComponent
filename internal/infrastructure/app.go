@@ -69,8 +69,7 @@ func (app *ginApplication) Run() error {
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	middleware.InitMetrics()
 	routerApiV1 := router.Group("/api/v1")
-	routerApiV1.Use(middleware.TracingRequestId())
-	routerApiV1.Use(middleware.PrometheusMiddleware())
+	routerApiV1.Use(middleware.TracingRequestId(), middleware.PrometheusMiddleware())
 
 	routerApiV1.GET("/weather/city/:city/temperature", handlers.FindCityCurrentTemperatureHandler(app.logger, app.findCityCurrentTemperatureQuery))
 	routerApiV1.GET("/weather/city/:city/temperature/last/day", handlers.GetCityLastDayTemperatureAverageHandler(app.logger, app.getCityLastDayTemperatureAverageQuery))
