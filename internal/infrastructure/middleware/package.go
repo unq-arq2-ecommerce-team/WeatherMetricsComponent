@@ -78,7 +78,7 @@ func incrementRequestOfDuration(d float64) {
 		return
 	}
 	if d <= 0.5 {
-		requestsDurationSecondsBucket.WithLabelValues("1").Inc()
+		requestsDurationSecondsBucket.WithLabelValues("0.5").Inc()
 		return
 	}
 	if d <= 1 {
