@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/sony/gobreaker"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	swaggerDocs "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/docs"
@@ -38,6 +39,7 @@ type ginApplication struct {
 	findCityCurrentTemperatureQuery        *application.FindCityCurrentTemperatureQuery
 	getCityLastDayTemperatureAverageQuery  *application.GetCityLastDayTemperatureAverageQuery
 	getCityLastWeekTemperatureAverageQuery *application.GetCityLastWeekTemperatureAverageQuery
+	cb                                     *gobreaker.CircuitBreaker
 }
 
 func NewGinApplication(

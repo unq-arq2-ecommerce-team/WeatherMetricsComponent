@@ -1,20 +1,28 @@
 package config
 
 import (
+	"time"
+
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	loggerPkg "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
-	"time"
 )
 
 const ServiceName = "WeatherMetricsComponent"
 
 type Config struct {
-	Environment    string          `required:"true" default:"development"`
-	Port           int             `required:"true" default:"8080"`
-	PrometheusPort int             `required:"true" default:"8081"`
-	LogLevel       string          `split_words:"true" default:"DEBUG"`
-	Weather        WeatherEndpoint `required:"true"`
+	Environment    string               `required:"true" default:"development"`
+	Port           int                  `required:"true" default:"8080"`
+	PrometheusPort int                  `required:"true" default:"8081"`
+	LogLevel       string               `split_words:"true" default:"DEBUG"`
+	Weather        WeatherEndpoint      `required:"true"`
+	CircuitBreaker CircuitBreakerConfig `split_words:"true" required:"true"`
+}
+
+type CircuitBreakerConfig struct {
+	FailuresRatio float64       `split_words:"true" required:"true"`
+	MinRequests   int           `split_words:"true" required:"true"`
+	Timeout       time.Duration `split_words:"true" default:"1m"`
 }
 
 type WeatherEndpoint struct {
