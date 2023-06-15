@@ -8,6 +8,14 @@ import (
 const day = time.Hour * 24
 const week = day * 7
 
+// ParseOrNil : elem must be a pointer of T (*T)
+func ParseOrNil[T any](elem interface{}) *T {
+	if elem == nil {
+		return nil
+	}
+	return elem.(*T)
+}
+
 func ParseStruct(obj interface{}) string {
 	jsonData, err := json.Marshal(obj)
 	if err != nil {

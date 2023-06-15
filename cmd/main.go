@@ -24,7 +24,7 @@ func main() {
 	cacheClient := cache.NewLocalMemoryCacheClient(logger, cacheTables)
 
 	// repositories
-	baseWeatherRepo := http.NewWeatherRepository(logger, http.NewClient(conf.Weather.HttpConfig), conf.Weather)
+	baseWeatherRepo := http.NewWeatherRepository(logger, http.NewClient(logger, conf.Weather.HttpConfig), conf.Weather)
 	cacheWeatherRepo := cache.NewWeatherRepository(logger, cacheClient, baseWeatherRepo)
 
 	//circuit breaker

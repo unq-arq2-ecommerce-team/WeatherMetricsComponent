@@ -72,3 +72,19 @@ func Test_GetNextHour(t *testing.T) {
 	assert.Equal(t, expectedDate1, GetNextHour(date1))
 	assert.Equal(t, expectedDate2, GetNextHour(date2))
 }
+
+func Test_ParseOrNilInterface(t *testing.T) {
+	var elem1 interface{}
+	var elem2 interface{}
+	var elem3 interface{}
+
+	timestamp := time.Now()
+	elem2 = &Weather{City: "Quilmes", Temperature: 25.5, Timestamp: timestamp}
+	elem3 = &Weather{City: "Madrid", Temperature: -1.5, Timestamp: timestamp}
+	panicElem := Weather{City: "Quilmes", Temperature: 25.5, Timestamp: timestamp}
+
+	assert.Nil(t, ParseOrNil[Weather](elem1))
+	assert.Equal(t, ParseOrNil[Weather](elem2), &Weather{City: "Quilmes", Temperature: 25.5, Timestamp: timestamp})
+	assert.Equal(t, ParseOrNil[Weather](elem3), &Weather{City: "Madrid", Temperature: -1.5, Timestamp: timestamp})
+	assert.Panics(t, func() { ParseOrNil[Weather](panicElem) })
+}

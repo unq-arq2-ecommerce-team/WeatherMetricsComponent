@@ -21,9 +21,8 @@ func NewGetCityLastDayTemperatureAverageQuery(weatherRepo domain.WeatherReposito
 
 func (q *GetCityLastDayTemperatureAverageQuery) Do(ctx context.Context, city string) (*domain.AverageTemperature, error) {
 	dateFrom, dateTo := domain.GetLastDayDates()
-
 	avgTemp, err := q.cb.Execute(func() (interface{}, error) {
 		return q.weatherRepo.GetAverageTemperatureByCityAndDateRange(ctx, city, dateFrom, dateTo)
 	})
-	return avgTemp.(*domain.AverageTemperature), err
+	return domain.ParseOrNil[domain.AverageTemperature](avgTemp), err
 }

@@ -20,9 +20,8 @@ func NewFindCityCurrentTemperatureQuery(weatherRepo domain.WeatherRepository, cb
 }
 
 func (q *FindCityCurrentTemperatureQuery) Do(ctx context.Context, city string) (*domain.Weather, error) {
-
 	weather, err := q.cb.Execute(func() (interface{}, error) {
 		return q.weatherRepo.FindCurrentTemperatureByCity(ctx, city)
 	})
-	return weather.(*domain.Weather), err
+	return domain.ParseOrNil[domain.Weather](weather), err
 }

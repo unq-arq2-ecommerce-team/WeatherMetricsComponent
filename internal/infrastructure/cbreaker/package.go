@@ -24,7 +24,7 @@ func getSettings(logger domain.Logger, conf config.CircuitBreakerConfig) gobreak
 			log.Errorf("Circuit breaker named %s is open", name)
 		}
 		if from == gobreaker.StateOpen && to == gobreaker.StateHalfOpen {
-			log.Infof("Circuit breaker named %s from Open to  Half-open", name)
+			log.Infof("Circuit breaker named %s from Open to Half-open", name)
 		}
 		if from == gobreaker.StateHalfOpen && to == gobreaker.StateClosed {
 			log.Infof("Circuit breaker named %s from Half-open to Closed", name)

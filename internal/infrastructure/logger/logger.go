@@ -7,7 +7,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/domain"
-	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger/hooks"
 )
 
 const JsonFormat = "JSON"
@@ -41,9 +40,9 @@ func New(config *Config) domain.Logger {
 		logger:  logrus.StandardLogger(),
 		dFields: fields,
 	}
-	lokiHook := hooks.BuildLokiHook()
-	newLogger.logger.AddHook(lokiHook)
 	configure(config)
+	lokiHook := BuildLokiHook(config)
+	newLogger.logger.AddHook(lokiHook)
 	return newLogger
 }
 
