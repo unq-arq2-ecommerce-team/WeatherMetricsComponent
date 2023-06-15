@@ -18,6 +18,7 @@ func main() {
 		EnvironmentName: conf.Environment,
 		LogLevel:        conf.LogLevel,
 		LogFormat:       loggerPkg.JsonFormat,
+		LokiHost:        conf.LokiHost,
 	})
 
 	cacheTables := initCacheTables(conf.Weather.CurrentTemp.Cache, conf.Weather.AvgTemp.Cache)

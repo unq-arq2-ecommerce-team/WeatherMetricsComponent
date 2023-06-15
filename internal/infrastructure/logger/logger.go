@@ -29,7 +29,23 @@ type Config struct {
 	EnvironmentName string
 	LogLevel        string
 	LogFormat       string
+	LokiHost        string
 	DefaultFields   map[string]interface{}
+}
+
+// DefaultLogger creates a new Logger with default configuration
+func DefaultLogger(serviceName, logFormat string) domain.Logger {
+	config := &Config{
+		ServiceName: serviceName,
+		LogFormat:   logFormat,
+	}
+	fields := addIfNotEmpty(config.DefaultFields, "serviceName", serviceName)
+	defaultLogger := &logger{
+		logger:  logrus.StandardLogger(),
+		dFields: fields,
+	}
+	configure(config)
+	return defaultLogger
 }
 
 // New creates a new Logger from some configuration

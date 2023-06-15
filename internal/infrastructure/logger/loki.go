@@ -5,8 +5,6 @@ import (
 	"github.com/yukitsune/lokirus"
 )
 
-const LokiEndpoint = "http://loki:3100"
-
 func BuildLokiHook(conf *Config) *lokirus.LokiHook {
 	opts := lokirus.NewLokiHookOptions().
 		// Grafana doesn't have a "panic" level, but it does have a "critical" level
@@ -19,7 +17,7 @@ func BuildLokiHook(conf *Config) *lokirus.LokiHook {
 		})
 
 	return lokirus.NewLokiHookWithOpts(
-		LokiEndpoint,
+		conf.LokiHost,
 		opts,
 		logrus.InfoLevel,
 		logrus.WarnLevel,
