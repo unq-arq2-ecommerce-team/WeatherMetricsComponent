@@ -16,9 +16,9 @@ import (
 const deltaRetryWait = 2 * time.Second
 
 func NewDefaultClient() *http.Client {
-	client := cleanhttp.DefaultPooledClient()
-	client.Transport = otelhttp.NewTransport(client.Transport)
-	return cleanhttp.DefaultPooledClient()
+	return &http.Client{
+		Transport: otelhttp.NewTransport(cleanhttp.DefaultPooledTransport()),
+	}
 }
 
 func NewClient(logger domain.Logger, httpConfig config.HttpConfig) *http.Client {
