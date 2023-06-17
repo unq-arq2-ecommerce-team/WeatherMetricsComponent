@@ -15,6 +15,7 @@ import (
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/config"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/handlers"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/middleware"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 // Application
@@ -63,6 +64,7 @@ func (app *ginApplication) Run() error {
 	gin.DefaultWriter = io.Discard
 
 	router := gin.Default()
+	router.Use(otelgin.Middleware("otel-otlp-go-service"))
 
 	router.GET("/", HealthCheck)
 
