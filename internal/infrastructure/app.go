@@ -64,7 +64,7 @@ func (app *ginApplication) Run() error {
 	gin.DefaultWriter = io.Discard
 
 	router := gin.Default()
-	router.Use(otelgin.Middleware("otel-otlp-go-service"))
+	router.Use(otelgin.Middleware("weather-metrics"))
 
 	router.GET("/", HealthCheck)
 
