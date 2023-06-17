@@ -6,6 +6,7 @@ import (
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/domain"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/config"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"net/http"
 	"time"
 
@@ -15,6 +16,8 @@ import (
 const deltaRetryWait = 2 * time.Second
 
 func NewDefaultClient() *http.Client {
+	client := cleanhttp.DefaultPooledClient()
+	client.Transport = otelhttp.NewTransport(client.Transport)
 	return cleanhttp.DefaultPooledClient()
 }
 
