@@ -6,11 +6,13 @@ Servicio para consumir metricas de clima.
 
 - [Golang](https://go.dev/)
 - [Gin (WEB API)](https://gin-gonic.com/)
-- [MongoDB](https://www.mongodb.com/)
+- [Redis](https://redis.io/)
 
 ## Prerequisitos:
 
 - Go 1.20 or up / Docker
+- Instancia de WeatherLoaderService
+- Instancia de Redis
 
 ## Swagger
 

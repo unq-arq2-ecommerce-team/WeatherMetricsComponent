@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.9.1
+	github.com/go-redis/redis/v7 v7.4.1
 	github.com/google/go-querystring v1.1.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-cleanhttp v0.5.2

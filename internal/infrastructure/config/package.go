@@ -18,6 +18,8 @@ type Config struct {
 	PrometheusPort int                  `required:"true" default:"8081"`
 	LogLevel       string               `split_words:"true" default:"DEBUG"`
 	LokiHost       string               `split_words:"true" required:"true"`
+	Redis          RedisConfig          `split_words:"true" required:"true"`
+	LocalCache     LocalCacheConfig     `split_words:"true" required:"true"`
 	Weather        WeatherEndpoint      `required:"true"`
 	CircuitBreaker CircuitBreakerConfig `split_words:"true" required:"true"`
 }
@@ -35,8 +37,7 @@ type WeatherEndpoint struct {
 }
 
 type EndpointConfig struct {
-	Url   string      `split_words:"true" required:"true"`
-	Cache CacheConfig `split_words:"true" required:"true"`
+	Url string `split_words:"true" required:"true"`
 }
 
 type HttpConfig struct {
@@ -45,9 +46,15 @@ type HttpConfig struct {
 	RetryWait time.Duration `split_words:"true" default:"15s"`
 }
 
-type CacheConfig struct {
-	DefaultExp time.Duration `split_words:"true" required:"true"`
-	PurgesExp  time.Duration `split_words:"true" required:"true"`
+// LocalCacheConfig PurgesExpiration is how often local cache is cleaned up
+type LocalCacheConfig struct {
+	DefaultExpiration time.Duration `split_words:"true" required:"true"`
+	PurgesExpiration  time.Duration `split_words:"true" required:"true"`
+}
+
+type RedisConfig struct {
+	Uri string `split_words:"true" required:"true"`
+	Db  string `split_words:"true" required:"true"`
 }
 
 func LoadConfig() Config {
