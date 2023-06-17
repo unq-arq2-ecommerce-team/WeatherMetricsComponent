@@ -14,6 +14,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/propagation"
 
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -67,7 +68,7 @@ func initCacheTables(currentTemp, avgTemp config.CacheConfig) map[string]*c.Cach
 	}
 }
 
-func initTracerAuto() func(context.Context) error {
+func initTracerAuto() func(ctx context.Context) error {
 
 	exporter, err := otlptrace.New(
 		context.Background(),
@@ -99,5 +100,9 @@ func initTracerAuto() func(context.Context) error {
 			sdktrace.WithResource(resources),
 		),
 	)
+
+	// set global propagator to tracecontext (the default is no-op).
+	otel.SetTextMapPropagator(propagation.TraceContext{})
+
 	return exporter.Shutdown
 }
