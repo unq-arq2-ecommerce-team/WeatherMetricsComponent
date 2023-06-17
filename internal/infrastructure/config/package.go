@@ -53,8 +53,8 @@ type LocalCacheConfig struct {
 }
 
 type RedisConfig struct {
-	Uri string `split_words:"true" required:"true"`
-	Db  string `split_words:"true" required:"true"`
+	Uri     string        `split_words:"true" required:"true"`
+	Timeout time.Duration `split_words:"true" default:"10s"`
 }
 
 func LoadConfig() Config {

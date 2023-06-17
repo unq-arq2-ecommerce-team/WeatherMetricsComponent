@@ -2,7 +2,8 @@ package redis
 
 import (
 	"context"
-	"github.com/go-redis/redis/v7"
+	"encoding/json"
+	"github.com/redis/go-redis/v9"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/domain"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/cache"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/config"
@@ -22,11 +23,14 @@ func NewCacheClient(logger domain.Logger, conf config.RedisConfig) cache.MemoryC
 }
 
 func newClient(logger domain.Logger, conf config.RedisConfig) *redis.Client {
-	client := redis.NewClient(&redis.Options{
-		Addr: conf.Uri,
-		DB:   0,
-	})
-	if _, err := client.Ping().Result(); err != nil {
+	ctx, cancelFn := context.WithTimeout(context.Background(), conf.Timeout)
+	defer cancelFn()
+	opts, err := redis.ParseURL(conf.Uri)
+	if err != nil {
+		logger.WithFields(domain.LoggerFields{"error": err}).Fatal("error parsing redis url")
+	}
+	client := redis.NewClient(opts)
+	if _, err := client.Ping(ctx).Result(); err != nil {
 		logger.WithFields(domain.LoggerFields{"error": err}).Fatal("error connecting to redis")
 	}
 	logger.Infof("connected to redis")
@@ -37,7 +41,14 @@ func newClient(logger domain.Logger, conf config.RedisConfig) *redis.Client {
 func (c *redisCacheClient) Save(ctx context.Context, table, key string, value interface{}, expiresIn time.Duration) error {
 	finalKey := cache.BuildCacheKey(table, key)
 	log := c.logger.WithRequestId(ctx).WithFields(domain.LoggerFields{"method": "Save", "table": table, "key": key, "finalKey": finalKey})
-	if err := c.client.Set(finalKey, value, expiresIn).Err(); err != nil {
+
+	value, err := json.Marshal(value)
+	if err != nil {
+		log.WithFields(domain.LoggerFields{"error": err}).Errorf("cannot marshal value")
+		return err
+	}
+
+	if err := c.client.Set(ctx, finalKey, value, expiresIn).Err(); err != nil {
 		log.WithFields(domain.LoggerFields{"error": err}).Errorf("error save in redis with key %s", finalKey)
 		return err
 	}
@@ -49,7 +60,7 @@ func (c *redisCacheClient) Save(ctx context.Context, table, key string, value in
 func (c *redisCacheClient) Get(ctx context.Context, table, key string) (interface{}, bool, error) {
 	finalKey := cache.BuildCacheKey(table, key)
 	log := c.logger.WithRequestId(ctx).WithFields(domain.LoggerFields{"method": "Get", "table": table, "key": key, "finalKey": finalKey})
-	elemString, err := c.client.Get(finalKey).Result()
+	elemString, err := c.client.Get(ctx, finalKey).Result()
 	if err != nil && err != redis.Nil {
 		log.WithFields(domain.LoggerFields{"error": err}).Errorf("error get in redis with key %s", finalKey)
 		return nil, false, err
