@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	ServiceName = "WeatherMetricsComponent"
+	OtlServiceName = "weather-metrics"
+	ServiceName    = "WeatherMetricsComponent"
 )
 
 type Config struct {
@@ -18,6 +19,7 @@ type Config struct {
 	PrometheusPort int                  `required:"true" default:"8081"`
 	LogLevel       string               `split_words:"true" default:"DEBUG"`
 	LokiHost       string               `split_words:"true" required:"true"`
+	Otel           OtelConfig           `split_words:"true" required:"true"`
 	Weather        WeatherEndpoint      `required:"true"`
 	CircuitBreaker CircuitBreakerConfig `split_words:"true" required:"true"`
 }
@@ -48,6 +50,10 @@ type HttpConfig struct {
 type CacheConfig struct {
 	DefaultExp time.Duration `split_words:"true" required:"true"`
 	PurgesExp  time.Duration `split_words:"true" required:"true"`
+}
+
+type OtelConfig struct {
+	URL string `split_words:"true" required:"true"`
 }
 
 func LoadConfig() Config {
