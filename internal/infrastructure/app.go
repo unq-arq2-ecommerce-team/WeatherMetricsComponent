@@ -79,7 +79,7 @@ func (app *ginApplication) Run() error {
 
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	app.logger.Infof("running http server on port %d", app.config.Port)
+	app.logger.Infof("running http server on port %d, and env %s", app.config.Port, app.config.Environment)
 	return router.Run(fmt.Sprintf(":%v", app.config.Port))
 }
 

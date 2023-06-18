@@ -35,9 +35,8 @@ func main() {
 	redisCacheClient := redisCache.NewCacheClient(logger, conf.Redis)
 
 	// repositories
-	weatherHttpConfig := conf.Weather.HttpConfig
-	weatherHttpConfig.OtelEnabled = isIntegrationEnv
-	baseWeatherRepo := http.NewWeatherRepository(logger, http.NewClient(logger, weatherHttpConfig), conf.Weather)
+	conf.Weather.HttpConfig.OtelEnabled = isIntegrationEnv
+	baseWeatherRepo := http.NewWeatherRepository(logger, http.NewClient(logger, conf.Weather.HttpConfig), conf.Weather)
 	cacheWeatherRepo := cache.NewWeatherRepository(logger, redisCacheClient, baseWeatherRepo)
 
 	//circuit breaker
