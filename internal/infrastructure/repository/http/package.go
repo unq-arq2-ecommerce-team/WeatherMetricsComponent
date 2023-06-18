@@ -16,9 +16,7 @@ import (
 const deltaRetryWait = 2 * time.Second
 
 func NewDefaultClient() *http.Client {
-	defaultClient := cleanhttp.DefaultPooledClient()
-	defaultClient.Transport = cleanhttp.DefaultPooledTransport()
-	return defaultClient
+	return cleanhttp.DefaultPooledClient()
 }
 
 func NewClient(logger domain.Logger, httpConfig config.HttpConfig) *http.Client {
