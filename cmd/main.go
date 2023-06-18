@@ -1,9 +1,7 @@
 package main
 
 import (
-	"context"
 	app "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/application"
-	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/domain"
 	infra "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/cache"
 	redisCache "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/cache/redis"
@@ -25,13 +23,9 @@ func main() {
 	})
 
 	// OTEL
-	cleanupFn := otel.InitTracerAuto(logger, conf.Otel, config.OtlServiceName, config.ServiceName)
-	defer func() {
-		err := cleanupFn(context.Background())
-		if err != nil {
-			logger.WithFields(domain.LoggerFields{"error": err}).Errorf("some error found when clean up applied")
-		}
-	}()
+	if conf.IsIntegrationEnv() {
+		otel.InitOtelTrace(logger, conf.Otel)
+	}
 
 	// cache client
 	// localCacheClient := localCache.NewLocalMemoryCacheClient(logger, conf.LocalCache)

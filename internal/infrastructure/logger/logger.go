@@ -33,6 +33,10 @@ type Config struct {
 	DefaultFields   map[string]interface{}
 }
 
+func (c Config) IsIntegrationEnv() bool {
+	return c.EnvironmentName == "docker-compose"
+}
+
 // DefaultLogger creates a new Logger with default configuration
 func DefaultLogger(serviceName, logFormat string) domain.Logger {
 	config := &Config{
@@ -57,8 +61,7 @@ func New(config *Config) domain.Logger {
 		dFields: fields,
 	}
 	configure(config)
-	lokiHook := BuildLokiHook(config)
-	newLogger.logger.AddHook(lokiHook)
+	configureHooks(newLogger.logger, config)
 	return newLogger
 }
 
@@ -219,6 +222,13 @@ func collectFields(a map[string]interface{}, b map[string]interface{}) map[strin
 func configure(configuration *Config) {
 	logrus.SetLevel(getLevel(configuration.LogLevel))
 	logrus.SetFormatter(getFormatter(configuration.LogFormat))
+}
+
+func configureHooks(logger *logrus.Logger, configuration *Config) {
+	if configuration.IsIntegrationEnv() {
+		lokiHook := BuildLokiHook(configuration)
+		logger.AddHook(lokiHook)
+	}
 }
 
 func getLevel(logLevel string) logrus.Level {

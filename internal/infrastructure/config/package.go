@@ -10,6 +10,8 @@ import (
 const (
 	OtlServiceName = "weather-metrics"
 	ServiceName    = "WeatherMetricsComponent"
+
+	EnvDockerCompose = "docker-compose"
 )
 
 type Config struct {
@@ -23,6 +25,10 @@ type Config struct {
 	Otel           OtelConfig           `split_words:"true" required:"true"`
 	Weather        WeatherEndpoint      `required:"true"`
 	CircuitBreaker CircuitBreakerConfig `split_words:"true" required:"true"`
+}
+
+func (c Config) IsIntegrationEnv() bool {
+	return c.Environment == EnvDockerCompose
 }
 
 type CircuitBreakerConfig struct {
