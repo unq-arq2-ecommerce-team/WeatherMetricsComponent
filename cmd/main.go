@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	app "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/application"
 	infra "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/cache"
@@ -26,9 +27,8 @@ func main() {
 	})
 
 	// OTEL
-	if isIntegrationEnv {
-		otel.InitOtelTrace(logger, conf.Otel)
-	}
+	cleanupFn := otel.InitOtelTrace(context.Background(), logger, conf.Otel, isIntegrationEnv)
+	defer cleanupFn()
 
 	// cache client
 	// localCacheClient := localCache.NewLocalMemoryCacheClient(logger, conf.LocalCache)

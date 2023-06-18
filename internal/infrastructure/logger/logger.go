@@ -221,9 +221,10 @@ func configure(configuration *Config) {
 	logrus.SetFormatter(getFormatter(configuration.LogFormat))
 }
 
-func configureHooks(logger *logrus.Logger, configuration *Config) {
-	if configuration.IsIntegrationEnv {
-		lokiHook := BuildLokiHook(configuration)
+// configureHooks append hook into logger if config has IsIntegrationEnv flag true
+func configureHooks(logger *logrus.Logger, conf *Config) {
+	if conf.IsIntegrationEnv {
+		lokiHook := BuildLokiHook(conf)
 		logger.AddHook(lokiHook)
 	}
 }

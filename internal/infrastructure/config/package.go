@@ -4,6 +4,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	loggerPkg "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
+	"strings"
 	"time"
 )
 
@@ -27,8 +28,9 @@ type Config struct {
 	CircuitBreaker CircuitBreakerConfig `split_words:"true" required:"true"`
 }
 
+// IsIntegrationEnv return true if Enviroment is equal to EnvDockerCompose (no case sensitive)
 func (c Config) IsIntegrationEnv() bool {
-	return c.Environment == EnvDockerCompose
+	return strings.EqualFold(c.Environment, EnvDockerCompose)
 }
 
 type CircuitBreakerConfig struct {

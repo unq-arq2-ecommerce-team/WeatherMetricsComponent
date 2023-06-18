@@ -13,14 +13,17 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-func InitOtelTrace(logger domain.Logger, otelConf config.OtelConfig) {
-	cleanupFn := initTracerAuto(logger, otelConf, config.OtlServiceName, config.ServiceName)
-	defer func() {
-		err := cleanupFn(context.Background())
-		if err != nil {
-			logger.WithFields(domain.LoggerFields{"error": err}).Errorf("some error found when clean up applied")
+func InitOtelTrace(ctx context.Context, logger domain.Logger, otelConf config.OtelConfig, isEnabled bool) func() {
+	if isEnabled {
+		cleanupFn := initTracerAuto(logger, otelConf, config.OtlServiceName, config.ServiceName)
+		return func() {
+			err := cleanupFn(ctx)
+			if err != nil {
+				logger.WithFields(domain.LoggerFields{"error": err}).Errorf("some error found when clean up applied")
+			}
 		}
-	}()
+	}
+	return func() {}
 }
 
 func initTracerAuto(baseLogger domain.Logger, conf config.OtelConfig, serviceName, appName string) func(context.Context) error {
