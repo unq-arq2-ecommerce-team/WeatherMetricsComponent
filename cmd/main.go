@@ -14,16 +14,19 @@ import (
 
 func main() {
 	conf := config.LoadConfig()
+	isIntegrationEnv := conf.IsIntegrationEnv()
+
 	logger := loggerPkg.New(&loggerPkg.Config{
-		ServiceName:     config.ServiceName,
-		EnvironmentName: conf.Environment,
-		LogLevel:        conf.LogLevel,
-		LogFormat:       loggerPkg.JsonFormat,
-		LokiHost:        conf.LokiHost,
+		ServiceName:      config.ServiceName,
+		EnvironmentName:  conf.Environment,
+		IsIntegrationEnv: isIntegrationEnv,
+		LogLevel:         conf.LogLevel,
+		LogFormat:        loggerPkg.JsonFormat,
+		LokiHost:         conf.LokiHost,
 	})
 
 	// OTEL
-	if conf.IsIntegrationEnv() {
+	if isIntegrationEnv {
 		otel.InitOtelTrace(logger, conf.Otel)
 	}
 
@@ -32,7 +35,9 @@ func main() {
 	redisCacheClient := redisCache.NewCacheClient(logger, conf.Redis)
 
 	// repositories
-	baseWeatherRepo := http.NewWeatherRepository(logger, http.NewClient(logger, conf.Weather.HttpConfig), conf.Weather)
+	weatherHttpConfig := conf.Weather.HttpConfig
+	weatherHttpConfig.OtelEnabled = isIntegrationEnv
+	baseWeatherRepo := http.NewWeatherRepository(logger, http.NewClient(logger, weatherHttpConfig), conf.Weather)
 	cacheWeatherRepo := cache.NewWeatherRepository(logger, redisCacheClient, baseWeatherRepo)
 
 	//circuit breaker

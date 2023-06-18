@@ -5,6 +5,6 @@ import (
 	"net/http"
 )
 
-func WrapAndReturn(httpTransport *http.Transport) *otelhttp.Transport {
+func WrapAndReturn(httpTransport http.RoundTripper) *otelhttp.Transport {
 	return otelhttp.NewTransport(httpTransport)
 }

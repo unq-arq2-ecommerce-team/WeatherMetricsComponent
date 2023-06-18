@@ -17,13 +17,16 @@ const deltaRetryWait = 2 * time.Second
 
 func NewDefaultClient() *http.Client {
 	defaultClient := cleanhttp.DefaultPooledClient()
-	defaultClient.Transport = otel.WrapAndReturn(cleanhttp.DefaultPooledTransport())
+	defaultClient.Transport = cleanhttp.DefaultPooledTransport()
 	return defaultClient
 }
 
 func NewClient(logger domain.Logger, httpConfig config.HttpConfig) *http.Client {
 	httpClient := NewDefaultClient()
 	httpClient.Timeout = httpConfig.Timeout
+	if httpConfig.OtelEnabled {
+		httpClient.Transport = otel.WrapAndReturn(httpClient.Transport)
+	}
 
 	retryableClient := retryablehttp.NewClient()
 	retryableClient.Logger = logger.WithFields(domain.LoggerFields{"loggerFrom": "http.retryableClient"})

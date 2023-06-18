@@ -25,16 +25,13 @@ type entry struct {
 
 // Config is used to configure the Logger
 type Config struct {
-	ServiceName     string
-	EnvironmentName string
-	LogLevel        string
-	LogFormat       string
-	LokiHost        string
-	DefaultFields   map[string]interface{}
-}
-
-func (c Config) IsIntegrationEnv() bool {
-	return c.EnvironmentName == "docker-compose"
+	ServiceName      string
+	EnvironmentName  string
+	IsIntegrationEnv bool
+	LogLevel         string
+	LogFormat        string
+	LokiHost         string
+	DefaultFields    map[string]interface{}
 }
 
 // DefaultLogger creates a new Logger with default configuration
@@ -225,7 +222,7 @@ func configure(configuration *Config) {
 }
 
 func configureHooks(logger *logrus.Logger, configuration *Config) {
-	if configuration.IsIntegrationEnv() {
+	if configuration.IsIntegrationEnv {
 		lokiHook := BuildLokiHook(configuration)
 		logger.AddHook(lokiHook)
 	}
