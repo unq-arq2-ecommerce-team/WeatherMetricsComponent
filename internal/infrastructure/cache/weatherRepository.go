@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/domain"
 	"time"
@@ -13,12 +14,14 @@ const (
 	TableAvgTemperature     = "temperature:average"
 )
 
+// cacheWeatherRepository is a Decorator
 type cacheWeatherRepository struct {
 	logger            domain.Logger
 	cacheClient       MemoryCacheClient
 	weatherRepository domain.WeatherRepository
 }
 
+// NewWeatherRepository returns a Decorator
 func NewWeatherRepository(logger domain.Logger, cacheClient MemoryCacheClient, weatherRepository domain.WeatherRepository) domain.WeatherRepository {
 	return &cacheWeatherRepository{
 		logger:            logger.WithFields(domain.LoggerFields{"repository.cache": "cacheWeatherRepository"}),
@@ -103,10 +106,19 @@ func getAvgTempCacheKey(city string, dateFrom, dateTo time.Time) string {
 }
 
 func ParseWeather(log domain.Logger, data interface{}) (*domain.Weather, error) {
-	weather, ok := data.(*domain.Weather)
-	if !ok {
-		err := fmt.Errorf("raw data cannot be parsed to *domain.Weather")
-		log.WithFields(domain.LoggerFields{"error": err}).Error("error parsing data")
+	var weather *domain.Weather
+	switch data.(type) {
+	case *domain.Weather:
+		weather = data.(*domain.Weather)
+	case string:
+		rawData := []byte(data.(string))
+		if err := json.Unmarshal(rawData, &weather); err != nil {
+			log.WithFields(domain.LoggerFields{"error": err}).Errorf("error decoding data as string")
+			return nil, fmt.Errorf("cache weather repository parse data error")
+		}
+	default:
+		err := fmt.Errorf("raw data cannot be parsed to *domain.Weather with data %v", data)
+		log.WithFields(domain.LoggerFields{"error": err}).Error("cache weather repository parse data error")
 		return nil, err
 	}
 	log.Info("successful get weather from cache")
@@ -114,10 +126,19 @@ func ParseWeather(log domain.Logger, data interface{}) (*domain.Weather, error) 
 }
 
 func ParseAvgTemp(log domain.Logger, data interface{}) (*domain.AverageTemperature, error) {
-	avgTemp, ok := data.(*domain.AverageTemperature)
-	if !ok {
-		err := fmt.Errorf("raw data cannot be parsed to *domain.AverageTemperature")
-		log.WithFields(domain.LoggerFields{"error": err}).Error("error parsing data")
+	var avgTemp *domain.AverageTemperature
+	switch data.(type) {
+	case *domain.AverageTemperature:
+		avgTemp = data.(*domain.AverageTemperature)
+	case string:
+		rawData := []byte(data.(string))
+		if err := json.Unmarshal(rawData, &avgTemp); err != nil {
+			log.WithFields(domain.LoggerFields{"error": err}).Errorf("error decoding data as string")
+			return nil, fmt.Errorf("cache weather repository parse data error")
+		}
+	default:
+		err := fmt.Errorf("raw data cannot be parsed to *domain.AverageTemperature with data %v", data)
+		log.WithFields(domain.LoggerFields{"error": err}).Error("cache weather repository parse data error")
 		return nil, err
 	}
 	log.Info("successful get average temperature from cache")

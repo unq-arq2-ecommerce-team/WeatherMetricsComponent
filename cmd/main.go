@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	c "github.com/patrickmn/go-cache"
 	app "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/application"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/domain"
 	infra "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/cache"
+	redisCache "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/cache/redis"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/cbreaker"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/config"
 	loggerPkg "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
@@ -24,9 +24,6 @@ func main() {
 		LokiHost:        conf.LokiHost,
 	})
 
-	cacheTables := initCacheTables(conf.Weather.CurrentTemp.Cache, conf.Weather.AvgTemp.Cache)
-	cacheClient := cache.NewLocalMemoryCacheClient(logger, cacheTables)
-
 	// OTEL
 	cleanupFn := otel.InitTracerAuto(logger, conf.Otel, config.OtlServiceName, config.ServiceName)
 	defer func() {
@@ -36,9 +33,13 @@ func main() {
 		}
 	}()
 
+	// cache client
+	// localCacheClient := localCache.NewLocalMemoryCacheClient(logger, conf.LocalCache)
+	redisCacheClient := redisCache.NewCacheClient(logger, conf.Redis)
+
 	// repositories
 	baseWeatherRepo := http.NewWeatherRepository(logger, http.NewClient(logger, conf.Weather.HttpConfig), conf.Weather)
-	cacheWeatherRepo := cache.NewWeatherRepository(logger, cacheClient, baseWeatherRepo)
+	cacheWeatherRepo := cache.NewWeatherRepository(logger, redisCacheClient, baseWeatherRepo)
 
 	//circuit breaker
 	cb := cbreaker.NewCircuitBreaker(logger, conf.CircuitBreaker)
@@ -56,11 +57,4 @@ func main() {
 		getCityLastWeekTemperatureAverageQuery,
 	)
 	logger.Fatal(application.Run())
-}
-
-func initCacheTables(currentTemp, avgTemp config.CacheConfig) map[string]*c.Cache {
-	return map[string]*c.Cache{
-		cache.TableCurrentTemperature: c.New(currentTemp.DefaultExp, currentTemp.PurgesExp),
-		cache.TableAvgTemperature:     c.New(avgTemp.DefaultExp, avgTemp.PurgesExp),
-	}
 }
