@@ -25,12 +25,13 @@ type entry struct {
 
 // Config is used to configure the Logger
 type Config struct {
-	ServiceName     string
-	EnvironmentName string
-	LogLevel        string
-	LogFormat       string
-	LokiHost        string
-	DefaultFields   map[string]interface{}
+	ServiceName      string
+	EnvironmentName  string
+	IsIntegrationEnv bool
+	LogLevel         string
+	LogFormat        string
+	LokiHost         string
+	DefaultFields    map[string]interface{}
 }
 
 // DefaultLogger creates a new Logger with default configuration
@@ -57,8 +58,7 @@ func New(config *Config) domain.Logger {
 		dFields: fields,
 	}
 	configure(config)
-	lokiHook := BuildLokiHook(config)
-	newLogger.logger.AddHook(lokiHook)
+	configureHooks(newLogger.logger, config)
 	return newLogger
 }
 
@@ -219,6 +219,14 @@ func collectFields(a map[string]interface{}, b map[string]interface{}) map[strin
 func configure(configuration *Config) {
 	logrus.SetLevel(getLevel(configuration.LogLevel))
 	logrus.SetFormatter(getFormatter(configuration.LogFormat))
+}
+
+// configureHooks append hook into logger if config has IsIntegrationEnv flag true
+func configureHooks(logger *logrus.Logger, conf *Config) {
+	if conf.IsIntegrationEnv {
+		lokiHook := BuildLokiHook(conf)
+		logger.AddHook(lokiHook)
+	}
 }
 
 func getLevel(logLevel string) logrus.Level {

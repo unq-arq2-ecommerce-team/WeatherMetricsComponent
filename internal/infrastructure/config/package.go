@@ -1,15 +1,18 @@
 package config
 
 import (
-	"time"
-
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	loggerPkg "github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
+	"strings"
+	"time"
 )
 
 const (
-	ServiceName = "WeatherMetricsComponent"
+	OtlServiceName = "weather-metrics"
+	ServiceName    = "WeatherMetricsComponent"
+
+	EnvDockerCompose = "docker-compose"
 )
 
 type Config struct {
@@ -20,8 +23,14 @@ type Config struct {
 	LokiHost       string               `split_words:"true" required:"true"`
 	Redis          RedisConfig          `split_words:"true" required:"true"`
 	LocalCache     LocalCacheConfig     `split_words:"true" required:"true"`
+	Otel           OtelConfig           `split_words:"true" required:"true"`
 	Weather        WeatherEndpoint      `required:"true"`
 	CircuitBreaker CircuitBreakerConfig `split_words:"true" required:"true"`
+}
+
+// IsIntegrationEnv return true if Enviroment is equal to EnvDockerCompose (no case sensitive)
+func (c Config) IsIntegrationEnv() bool {
+	return strings.EqualFold(c.Environment, EnvDockerCompose)
 }
 
 type CircuitBreakerConfig struct {
@@ -41,9 +50,10 @@ type EndpointConfig struct {
 }
 
 type HttpConfig struct {
-	Timeout   time.Duration `default:"10s"`
-	Retries   int           `default:"0"`
-	RetryWait time.Duration `split_words:"true" default:"15s"`
+	OtelEnabled bool          `required:"true" default:"false"`
+	Timeout     time.Duration `default:"10s"`
+	Retries     int           `default:"0"`
+	RetryWait   time.Duration `split_words:"true" default:"15s"`
 }
 
 // LocalCacheConfig PurgesExpiration is how often local cache is cleaned up
@@ -55,6 +65,10 @@ type LocalCacheConfig struct {
 type RedisConfig struct {
 	Uri     string        `split_words:"true" required:"true"`
 	Timeout time.Duration `split_words:"true" default:"10s"`
+}
+
+type OtelConfig struct {
+	URL string `split_words:"true" required:"true"`
 }
 
 func LoadConfig() Config {
