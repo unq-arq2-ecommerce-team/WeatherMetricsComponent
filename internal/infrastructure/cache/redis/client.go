@@ -84,7 +84,7 @@ func (c *redisCacheClient) Get(ctx context.Context, table, key string) (interfac
 		log.WithFields(domain.LoggerFields{"error": err}).Errorf("error get in redis with key %s", finalKey)
 		return nil, false, err
 	}
-	log.Debugf("redis get ok with final key %s with value %s", finalKey, elemString)
 	found := err != redis.Nil
+	log.Debugf("redis get ok with final key %s, found %v and value %s", finalKey, elemString)
 	return elemString, found, nil
 }
