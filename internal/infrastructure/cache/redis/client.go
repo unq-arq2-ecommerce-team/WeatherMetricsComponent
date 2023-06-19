@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"encoding/json"
+	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/domain"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/cache"
@@ -33,8 +34,26 @@ func newClient(logger domain.Logger, conf config.RedisConfig) *redis.Client {
 	if _, err := client.Ping(ctx).Result(); err != nil {
 		logger.WithFields(domain.LoggerFields{"error": err}).Fatal("error connecting to redis")
 	}
+
+	if conf.OtelEnabled {
+		instrumentOtel(client)
+		logger.Infof("redis otel instrumentation enabled")
+	}
+
 	logger.Infof("connected to redis")
 	return client
+}
+
+func instrumentOtel(client *redis.Client) {
+	// Enable tracing instrumentation.
+	if err := redisotel.InstrumentTracing(client); err != nil {
+		panic(err)
+	}
+
+	// Enable metrics instrumentation.
+	if err := redisotel.InstrumentMetrics(client); err != nil {
+		panic(err)
+	}
 }
 
 // Save : returns error if key value cannot be saved in param table

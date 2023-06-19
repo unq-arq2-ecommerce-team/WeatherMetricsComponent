@@ -32,6 +32,7 @@ func main() {
 
 	// cache client
 	// localCacheClient := localCache.NewLocalMemoryCacheClient(logger, conf.LocalCache)
+	conf.Redis.OtelEnabled = isIntegrationEnv
 	redisCacheClient := redisCache.NewCacheClient(logger, conf.Redis)
 
 	// repositories
