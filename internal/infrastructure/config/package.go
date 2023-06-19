@@ -65,7 +65,7 @@ type LocalCacheConfig struct {
 type RedisConfig struct {
 	Uri         string        `split_words:"true" required:"true"`
 	Timeout     time.Duration `split_words:"true" default:"10s"`
-	OtelEnabled bool          `required:"true"`
+	OtelEnabled bool          `required:"true" default:"false"`
 }
 
 type OtelConfig struct {
