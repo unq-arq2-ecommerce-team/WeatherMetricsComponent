@@ -36,7 +36,7 @@ func (c cacheWeatherRepository) FindCurrentTemperatureByCity(ctx context.Context
 	// get cache and returns if was found
 	cachedWeatherRaw, found, err := c.cacheClient.Get(ctx, TableCurrentTemperature, city)
 	if err != nil {
-		log.WithFields(domain.LoggerFields{"error": err}).Errorf("cache table not found")
+		log.WithFields(domain.LoggerFields{"error": err}).Errorf("cache client error")
 	}
 	if found {
 		log.Debug("successful get FindCurrentTemperatureByCity from cache")
@@ -67,7 +67,7 @@ func (c cacheWeatherRepository) GetAverageTemperatureByCityAndDateRange(ctx cont
 	// get cache and returns if was found
 	cachedAvgTempRaw, found, err := c.cacheClient.Get(ctx, TableAvgTemperature, cacheKey)
 	if err != nil {
-		log.WithFields(domain.LoggerFields{"error": err}).Errorf("cache table not found")
+		log.WithFields(domain.LoggerFields{"error": err}).Errorf("cache client error")
 	}
 	if found {
 		log.Debug("successful get GetAverageTemperatureByCityAndDateRange from cache")
