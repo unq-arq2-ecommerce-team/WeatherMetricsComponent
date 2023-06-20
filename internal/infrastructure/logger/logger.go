@@ -30,7 +30,6 @@ type Config struct {
 	IsIntegrationEnv bool
 	LogLevel         string
 	LogFormat        string
-	LokiHost         string
 	DefaultFields    map[string]interface{}
 }
 

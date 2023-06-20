@@ -20,7 +20,6 @@ type Config struct {
 	Port           int                  `required:"true" default:"8080"`
 	PrometheusPort int                  `required:"true" default:"8081"`
 	LogLevel       string               `split_words:"true" default:"DEBUG"`
-	LokiHost       string               `split_words:"true" required:"true"`
 	Redis          RedisConfig          `split_words:"true" required:"true"`
 	LocalCache     LocalCacheConfig     `split_words:"true" required:"true"`
 	Otel           OtelConfig           `split_words:"true" required:"true"`
