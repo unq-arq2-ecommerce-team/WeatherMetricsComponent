@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"fmt"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"io"
 	"net/http"
 
@@ -15,7 +16,6 @@ import (
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/config"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/handlers"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/middleware"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 // Application
@@ -64,14 +64,13 @@ func (app *ginApplication) Run() error {
 	gin.DefaultWriter = io.Discard
 
 	router := gin.Default()
-	router.Use(otelgin.Middleware(config.OtlServiceName))
 
 	router.GET("/", HealthCheck)
 
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	middleware.InitMetrics()
 	routerApiV1 := router.Group("/api/v1")
-	routerApiV1.Use(middleware.TracingRequestId(), middleware.PrometheusMiddleware())
+	routerApiV1.Use(middleware.TracingRequestId(), middleware.PrometheusMiddleware(), otelgin.Middleware(config.OtlServiceName))
 
 	routerApiV1.GET("/weather/city/:city/temperature", handlers.FindCityCurrentTemperatureHandler(app.logger, app.findCityCurrentTemperatureQuery))
 	routerApiV1.GET("/weather/city/:city/temperature/last/day", handlers.GetCityLastDayTemperatureAverageHandler(app.logger, app.getCityLastDayTemperatureAverageQuery))
