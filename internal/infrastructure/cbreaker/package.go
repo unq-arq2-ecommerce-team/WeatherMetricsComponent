@@ -1,6 +1,7 @@
 package cbreaker
 
 import (
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sony/gobreaker"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/domain"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/config"
@@ -29,6 +30,16 @@ func getSettings(logger domain.Logger, conf config.CircuitBreakerConfig) gobreak
 		if from == gobreaker.StateHalfOpen && to == gobreaker.StateClosed {
 			log.Infof("Circuit breaker named %s from Half-open to Closed", name)
 		}
+		circuitBreakerStatusChange(to)
 	}
 	return settings
+}
+
+var CircuitBreakerStatus = prometheus.NewGauge(prometheus.GaugeOpts{
+	Name: "circuit_breaker_status",
+	Help: "Current status of the circuit breaker (closed, half_open, open)",
+})
+
+func circuitBreakerStatusChange(newState gobreaker.State) {
+	CircuitBreakerStatus.Set(float64(newState))
 }

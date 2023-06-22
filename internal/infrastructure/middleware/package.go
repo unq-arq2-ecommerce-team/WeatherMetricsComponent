@@ -3,6 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/cbreaker"
 	"github.com/unq-arq2-ecommerce-team/WeatherMetricsComponent/internal/infrastructure/logger"
 )
 
@@ -51,6 +52,7 @@ func InitMetrics() {
 	prometheus.MustRegister(requestsDurationSecondsCount)
 	prometheus.MustRegister(requestsDurationSecondsBucket)
 	prometheus.MustRegister(httpDuration)
+	prometheus.MustRegister(cbreaker.CircuitBreakerStatus)
 }
 func PrometheusMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
