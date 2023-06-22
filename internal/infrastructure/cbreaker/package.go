@@ -15,6 +15,7 @@ func getSettings(logger domain.Logger, conf config.CircuitBreakerConfig) gobreak
 	log := logger.WithFields(domain.LoggerFields{"loggerFrom": "circuit breaker"})
 	var settings gobreaker.Settings
 	settings.Name = "WeatherMetricsComponentBreaker"
+	settings.IsSuccessful = isSuccessfulErr
 	settings.ReadyToTrip = func(counts gobreaker.Counts) bool {
 		failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
 		return counts.Requests >= uint32(conf.MinRequests) && failureRatio >= conf.FailuresRatio
@@ -42,4 +43,13 @@ var CircuitBreakerStatus = prometheus.NewGauge(prometheus.GaugeOpts{
 
 func circuitBreakerStatusChange(newState gobreaker.State) {
 	CircuitBreakerStatus.Set(float64(newState))
+}
+
+func isSuccessfulErr(err error) bool {
+	switch err.(type) {
+	case domain.WeatherNotFoundError, domain.AverageTemperatureNotFoundErr:
+		return true
+	default:
+		return false
+	}
 }
