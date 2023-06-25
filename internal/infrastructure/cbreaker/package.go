@@ -46,6 +46,9 @@ func circuitBreakerStatusChange(newState gobreaker.State) {
 }
 
 func isSuccessfulErr(err error) bool {
+	if err == nil {
+		return true
+	}
 	switch err.(type) {
 	case domain.WeatherNotFoundError, domain.AverageTemperatureNotFoundErr:
 		return true
