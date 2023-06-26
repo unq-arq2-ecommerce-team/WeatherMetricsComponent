@@ -6,6 +6,24 @@ import (
 	"time"
 )
 
+func Test_ParseStruct_WithCollectionsOrNested_Should_ReturnOk(t *testing.T) {
+	anomStruct := struct {
+		SomeArr    []string
+		SomeMap    map[string]string
+		SomeStruct struct{ SomeStr string }
+	}{
+		SomeArr:    []string{"a", "b"},
+		SomeMap:    map[string]string{"a": "1", "b": "2", "c": "3"},
+		SomeStruct: struct{ SomeStr string }{SomeStr: "sarasa"},
+	}
+	assert.Equal(t, `{"SomeArr":["a","b"],"SomeMap":{"a":"1","b":"2","c":"3"},"SomeStruct":{"SomeStr":"sarasa"}}`, ParseStruct(anomStruct))
+}
+
+func Test_ParseStruct_WithNoCommonEncodingJSON_Should_ReturnEmptyString(t *testing.T) {
+	idString := func(x string) string { return x }
+	assert.Equal(t, "", ParseStruct(idString))
+}
+
 func Test_GetRangePreviousDaysFromSimpleDateAndDayDuration(t *testing.T) {
 	year, month, _day, hour, min, sec, nsec := 2023, time.February, 13, 3, 5, 2, 0
 	paramDate := time.Date(year, month, _day, hour, min, sec, nsec, time.UTC)
